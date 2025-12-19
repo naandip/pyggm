@@ -31,18 +31,15 @@ A Python package for Gaussian Graphical Models with multiple regularization sele
 
 ## Installation
 
-### From source
+```bash
+pip install pyggm
+```
 
+Or install from source:
 ```bash
 git clone https://github.com/naandip/pyggm.git
 cd pyggm
 pip install -e .
-```
-
-### Development installation
-
-```bash
-pip install -e ".[dev]"
 ```
 
 ## Quick Start
