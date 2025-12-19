@@ -28,10 +28,13 @@ class GaussianGraphicalModel(BaseEstimator):
         Correlation type: 'pearson', 'spearman', or 'kendall'
     alpha : float or None, default=None
         Fixed regularization parameter. If None, selected via `method`.
+    alphas : array-like or None, default=None
+        Custom array of alpha values to evaluate. If provided, overrides
+        n_alphas and alpha_min_ratio. Useful for benchmarking.
     n_alphas : int, default=20
-        Number of alpha values to evaluate
+        Number of alpha values to evaluate (ignored if alphas is provided)
     alpha_min_ratio : float, default=0.01
-        Ratio of min to max alpha
+        Ratio of min to max alpha (ignored if alphas is provided)
     beta : float, default=0.05
         StARS instability threshold (only used if method='stars')
     n_subsamples : int, default=50
@@ -40,8 +43,9 @@ class GaussianGraphicalModel(BaseEstimator):
         Size of each subsample. If None, uses floor(10 * sqrt(n))
     gamma : float, default=0.5
         EBIC gamma parameter (only used if method='ebic')
-    cv : int, default=5
-        Number of CV folds (only used if method='cv')
+    cv : int or CV splitter, default=5
+        Cross-validation strategy (only used if method='cv').
+        If int, number of folds. If CV splitter object, uses custom folds.
     ensure_psd : bool, default=True
         Project correlation matrix to nearest PSD if needed
     n_jobs : int, default=1
@@ -85,12 +89,13 @@ class GaussianGraphicalModel(BaseEstimator):
     """
 
     def __init__(self, method='stars', correlation='pearson', alpha=None,
-                 n_alphas=20, alpha_min_ratio=0.01, beta=0.05,
+                 alphas=None, n_alphas=20, alpha_min_ratio=0.01, beta=0.05,
                  n_subsamples=50, subsample_size=None, gamma=0.5, cv=5,
                  ensure_psd=True, n_jobs=1, random_state=None, verbose=0):
         self.method = method
         self.correlation = correlation
         self.alpha = alpha
+        self.alphas = alphas
         self.n_alphas = n_alphas
         self.alpha_min_ratio = alpha_min_ratio
         self.beta = beta
@@ -146,7 +151,7 @@ class GaussianGraphicalModel(BaseEstimator):
                 print("Projecting correlation matrix to PSD")
             S = project_to_psd(S)
 
-        # Step 3: Build alpha grid or use fixed alpha
+        # Step 3: Build alpha grid or use fixed/custom alphas
         if self.alpha is not None:
             # Use fixed alpha
             self.alphas_ = np.array([self.alpha])
@@ -159,13 +164,20 @@ class GaussianGraphicalModel(BaseEstimator):
             self.covariance_ = model.covariance_
 
         else:
-            # Build alpha grid
-            alpha_max = np.max(np.abs(S - np.diag(np.diag(S))))
-            self.alphas_ = np.logspace(
-                np.log10(alpha_max * self.alpha_min_ratio),
-                np.log10(alpha_max),
-                num=self.n_alphas
-            )
+            # Use custom or automatically generated alpha grid
+            if self.alphas is not None:
+                # Use custom alpha array (for benchmarking)
+                self.alphas_ = np.asarray(self.alphas)
+                if self.verbose > 0:
+                    print(f"Using custom alpha grid: {len(self.alphas_)} values")
+            else:
+                # Build alpha grid automatically
+                alpha_max = np.max(np.abs(S - np.diag(np.diag(S))))
+                self.alphas_ = np.logspace(
+                    np.log10(alpha_max * self.alpha_min_ratio),
+                    np.log10(alpha_max),
+                    num=self.n_alphas
+                )
 
             # Step 4: Select regularization parameter
             if self.method == 'stars':
