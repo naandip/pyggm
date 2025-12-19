@@ -34,7 +34,7 @@ A Python package for Gaussian Graphical Models with multiple regularization sele
 ### From source
 
 ```bash
-git clone https://github.com/yourusername/pyggm.git
+git clone https://github.com/naandip/pyggm.git
 cd pyggm
 pip install -e .
 ```
@@ -458,3 +458,12 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Acknowledgments
 
 This package wraps scikit-learn's `GraphicalLasso` implementation and implements the StARS and EBIC selection procedures based on the cited papers.
+
+## Support
+
+- Issues: [GitHub Issues](https://github.com/naandip/pyggm/issues)
+- Documentation: [docs/](docs/)
+
+---
+
+**PyGGM** - A Python package for Gaussian Graphical Models

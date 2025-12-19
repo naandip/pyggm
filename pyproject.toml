@@ -9,7 +9,7 @@ description = "Gaussian Graphical Models with StARS, EBIC, and Nonparanormal met
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "Nandini Prasad", email = "nandini.prasad@columbia.edu"}
 ]
 keywords = ["graphical models", "precision matrix", "StARS", "graphical lasso", "network"]
 classifiers = [
@@ -48,9 +48,9 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/pyggm"
+Homepage = "https://github.com/naandip/pyggm"
 Documentation = "https://pyggm.readthedocs.io"
-Repository = "https://github.com/yourusername/pyggm"
+Repository = "https://github.com/naandip/pyggm"
 
 [tool.setuptools.packages.find]
 where = ["src"]
