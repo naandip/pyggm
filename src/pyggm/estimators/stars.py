@@ -104,26 +104,22 @@ def stars_select(X, alphas, n_subsamples=50, subsample_size=None,
             n_edges = np.sum(edge_probs > 0.5) / 2
             print(f"  Instability: {instability:.4f}, Avg edges: {n_edges:.1f}")
 
-        # Early stopping: if instability <= beta, we can stop
-        # (assuming monotonicity, though we check all to be safe)
-        if instability <= beta and i > 0:
-            if verbose > 0:
-                print(f"  Early stopping: instability {instability:.4f} <= beta {beta}")
-            break
-
-    # Apply monotonicity constraint (optional but recommended)
-    # Instability should be non-increasing with increasing alpha
+    # Apply monotonicity constraint (required for correct lambda selection)
+    # Instability should be non-increasing with INCREASING alpha
+    # For ascending alphas [small...large], cummin enforces this directly
     instabilities_monotone = np.minimum.accumulate(instabilities)
 
-    # Select smallest alpha with instability <= beta
+    # Select optimal alpha: smallest alpha (densest graph) with instability <= beta
+    # This ensures maximum power while maintaining stability (matches R's huge)
     valid_alphas = np.where(instabilities_monotone <= beta)[0]
 
     if len(valid_alphas) == 0:
-        # No alpha satisfies criterion; use last one (most regularized)
+        # No alpha satisfies criterion; use most regularized (largest alpha)
         if verbose > 0:
             print(f"Warning: No alpha with instability <= {beta}. Using most regularized.")
         best_idx = len(instabilities) - 1
     else:
+        # Select FIRST valid index = smallest alpha = densest graph (matches R's huge)
         best_idx = valid_alphas[0]
 
     best_alpha = alphas[best_idx]
