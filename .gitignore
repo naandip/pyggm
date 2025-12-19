@@ -40,6 +40,7 @@ env/
 .coverage
 htmlcov/
 .tox/
+pyggm-test-env/
 
 # Jupyter
 .ipynb_checkpoints/
