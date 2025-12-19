@@ -32,11 +32,15 @@ from .preprocessing.nonparanormal import NonparanormalTransformer
 from .preprocessing.correlation import rank_correlation
 from .utils.psd import project_to_psd, is_psd
 
+# Alias for convenience
+Nonparanormal = NonparanormalTransformer
+
 __version__ = "0.1.0"
 
 __all__ = [
     "GaussianGraphicalModel",
     "NonparanormalTransformer",
+    "Nonparanormal",  # Alias
     "rank_correlation",
     "project_to_psd",
     "is_psd",
