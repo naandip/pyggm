@@ -3,4 +3,7 @@
 from .nonparanormal import NonparanormalTransformer
 from .correlation import rank_correlation
 
-__all__ = ["NonparanormalTransformer", "rank_correlation"]
+# Alias for convenience
+Nonparanormal = NonparanormalTransformer
+
+__all__ = ["NonparanormalTransformer", "Nonparanormal", "rank_correlation"]

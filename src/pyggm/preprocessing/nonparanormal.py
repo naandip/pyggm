@@ -81,6 +81,8 @@ class NonparanormalTransformer(BaseEstimator, TransformerMixin):
         """
         Apply nonparanormal transformation.
 
+        Matches R's huge::huge.npn with npn.func='truncation'.
+
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
@@ -102,25 +104,31 @@ class NonparanormalTransformer(BaseEstimator, TransformerMixin):
 
         X_trans = np.zeros_like(X)
 
+        # Calculate truncation threshold (matches R's default)
+        if self.truncate:
+            delta = 1.0 / (4.0 * (n ** 0.25) * np.sqrt(np.pi * np.log(n)))
+        else:
+            delta = 0.0
+
         for j in range(p):
-            # Compute empirical CDF values using ranks
-            # Use searchsorted to find ranks efficiently
-            sorted_vals = self.empirical_cdfs_[j]
-            n_train = len(sorted_vals)
+            # Compute ranks using average method for ties (matches R)
+            ranks = stats.rankdata(X[:, j], method='average')
 
-            # Get ranks (position in sorted training data)
-            ranks = np.searchsorted(sorted_vals, X[:, j], side='right')
+            # Empirical CDF: rank / n (matches R exactly)
+            F_n = ranks / n
 
-            # Convert ranks to uniform [0,1] values
-            # Use midrank approach for ties
-            uniform_vals = (ranks + 0.5) / (n_train + 1)
-
+            # Apply truncation to avoid extreme values
             if self.truncate:
-                # Truncate to avoid infinities in inverse normal CDF
-                eps = 1e-10
-                uniform_vals = np.clip(uniform_vals, eps, 1 - eps)
+                F_n_trunc = np.maximum(delta, np.minimum(1.0 - delta, F_n))
+            else:
+                F_n_trunc = F_n
 
             # Apply inverse normal CDF
-            X_trans[:, j] = stats.norm.ppf(uniform_vals)
+            X_trans[:, j] = stats.norm.ppf(F_n_trunc)
+
+        # Normalize by std of first column (matches R's huge.npn)
+        # This ensures all columns have unit variance
+        std_col1 = np.std(X_trans[:, 0], ddof=1)
+        X_trans = X_trans / std_col1
 
         return X_trans
