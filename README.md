@@ -2,6 +2,7 @@
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Examples](https://img.shields.io/badge/examples-notebooks-orange)](https://github.com/naandip/pyggm/tree/main/examples)
 
 A Python package for Gaussian Graphical Models with multiple regularization selection methods and nonparanormal transformations.
 
@@ -74,6 +75,103 @@ plot_stars_path(model, ax=axes[1])
 plt.show()
 ```
 
+## Tutorials & Examples
+
+For comprehensive tutorials with real and simulated data, see the **[examples/](examples/)** folder:
+
+- **[Complete Tutorial with Real Data](examples/Complete_Tutorial_Real_Data.ipynb)** - End-to-end workflow using flow cytometry data
+  - Normality testing and Nonparanormal transformation
+  - Comparison of StARS, EBIC, and Cross-Validation methods
+  - Advanced visualizations and bootstrap stability analysis
+
+- **[Validation on Simulated Networks](examples/02_Validation_Simulated_Network.ipynb)** - Ground truth testing
+  - Five network types: hub, chain, random, block diagonal, scale-free
+  - Performance metrics (precision, recall, F1-score)
+  - Regularization path visualization
+
+---
+## API Reference
+
+### `GaussianGraphicalModel`
+
+**Main estimator class for Gaussian Graphical Models.**
+
+<details>
+<summary><b>Click to expand full API documentation</b></summary>
+
+#### Parameters
+- `method` (str): Regularization selection method ('stars', 'ebic', or 'cv')
+- `correlation` (str): Correlation type ('pearson', 'spearman', or 'kendall')
+- `alpha` (float or None): Fixed regularization parameter
+- `n_alphas` (int): Number of alpha values to evaluate
+- `alpha_min_ratio` (float): Ratio of min to max alpha
+- `beta` (float): StARS instability threshold
+- `n_subsamples` (int): Number of subsamples for StARS
+- `gamma` (float): EBIC gamma parameter
+- `cv` (int): Number of CV folds
+- `ensure_psd` (bool): Project correlation matrix to PSD
+- `n_jobs` (int): Number of parallel jobs
+- `random_state` (int or None): Random seed
+- `verbose` (int): Verbosity level
+
+#### Attributes
+- `precision_`: Estimated precision matrix
+- `covariance_`: Estimated covariance matrix
+- `adjacency_`: Binary adjacency matrix
+- `alpha_`: Selected regularization parameter
+- `n_edges_`: Number of edges
+- `alphas_`: Grid of alphas evaluated
+- `instabilities_`: StARS instabilities (if method='stars')
+- `ebic_scores_`: EBIC scores (if method='ebic')
+- `cv_scores_`: CV scores (if method='cv')
+
+#### Methods
+- `fit(X)`: Fit the model
+- `score(X)`: Compute average log-likelihood
+- `to_networkx(threshold, weighted, labels)`: Convert to NetworkX graph
+
+</details>
+
+---
+
+### `NonparanormalTransformer`
+
+**Gaussian copula transformation for non-Gaussian data.**
+
+<details>
+<summary><b>Click to expand API documentation</b></summary>
+
+#### Parameters
+
+- `truncate` (bool): Whether to truncate extreme values
+
+#### Methods
+- `fit(X)`: Learn empirical CDFs
+- `transform(X)`: Apply transformation
+- `fit_transform(X)`: Fit and transform in one step
+
+</details>
+
+---
+
+## Quick API Reference
+
+| Task | Code |
+|------|------|
+| **Fit with StARS** | `model = GaussianGraphicalModel(method='stars'); model.fit(X)` |
+| **Fit with EBIC** | `model = GaussianGraphicalModel(method='ebic', gamma=0.5); model.fit(X)` |
+| **Fit with CV** | `model = GaussianGraphicalModel(method='cv', cv=5); model.fit(X)` |
+| **Transform non-Gaussian data** | `X_new = NonparanormalTransformer().fit_transform(X)` |
+| **Use Spearman correlation** | `model = GaussianGraphicalModel(correlation='spearman'); model.fit(X)` |
+| **Fixed regularization** | `model = GaussianGraphicalModel(alpha=0.1); model.fit(X)` |
+| **Get precision matrix** | `theta = model.precision_` |
+| **Get adjacency matrix** | `adj = model.adjacency_` |
+| **Count edges** | `n_edges = model.n_edges_` |
+| **Convert to NetworkX** | `G = model.to_networkx(threshold=0.01)` |
+| **Plot network** | `plot_network(model.precision_, layout='spring')` |
+
+---
+
 ## Usage Examples
 
 ### 1. Basic Usage with Different Methods
@@ -92,7 +190,7 @@ model = GaussianGraphicalModel(
 model.fit(X)
 ```
 
-#### EBIC (Good for model selection)
+#### EBIC 
 
 ```python
 model = GaussianGraphicalModel(
@@ -283,54 +381,7 @@ print(f"  Edges: {G.number_of_edges()}")
 print(f"  Density: {2 * G.number_of_edges() / (p * (p-1)):.3f}")
 ```
 
-## API Reference
-
-### `GaussianGraphicalModel`
-
-Main estimator class for Gaussian Graphical Models.
-
-**Parameters:**
-- `method` (str): Regularization selection method ('stars', 'ebic', or 'cv')
-- `correlation` (str): Correlation type ('pearson', 'spearman', or 'kendall')
-- `alpha` (float or None): Fixed regularization parameter
-- `n_alphas` (int): Number of alpha values to evaluate
-- `alpha_min_ratio` (float): Ratio of min to max alpha
-- `beta` (float): StARS instability threshold
-- `n_subsamples` (int): Number of subsamples for StARS
-- `gamma` (float): EBIC gamma parameter
-- `cv` (int): Number of CV folds
-- `ensure_psd` (bool): Project correlation matrix to PSD
-- `n_jobs` (int): Number of parallel jobs
-- `random_state` (int or None): Random seed
-- `verbose` (int): Verbosity level
-
-**Attributes:**
-- `precision_`: Estimated precision matrix
-- `covariance_`: Estimated covariance matrix
-- `adjacency_`: Binary adjacency matrix
-- `alpha_`: Selected regularization parameter
-- `n_edges_`: Number of edges
-- `alphas_`: Grid of alphas evaluated
-- `instabilities_`: StARS instabilities (if method='stars')
-- `ebic_scores_`: EBIC scores (if method='ebic')
-- `cv_scores_`: CV scores (if method='cv')
-
-**Methods:**
-- `fit(X)`: Fit the model
-- `score(X)`: Compute average log-likelihood
-- `to_networkx(threshold, weighted, labels)`: Convert to NetworkX graph
-
-### `NonparanormalTransformer`
-
-Gaussian copula transformation for non-Gaussian data.
-
-**Parameters:**
-- `truncate` (bool): Whether to truncate extreme values
-
-**Methods:**
-- `fit(X)`: Learn empirical CDFs
-- `transform(X)`: Apply transformation
-- `fit_transform(X)`: Fit and transform in one step
+---
 
 ## Algorithm Details
 
@@ -369,11 +420,14 @@ The nonparanormal assumes a Gaussian copula: after transforming each variable's 
 
 **Reference:** Liu, H., Lafferty, J., & Wasserman, L. (2009). The nonparanormal: Semiparametric estimation of high dimensional undirected graphs. JMLR.
 
+---
+
 ## Performance Tips
 
 1. **Use parallelization**: Set `n_jobs=-1` to use all CPU cores
 2. **For large p**: Consider using `method='ebic'` (faster than StARS)
 3. **For interpretability**: Use `method='stars'` with default `beta=0.05`
+
 
 
 ## Citation
@@ -404,7 +458,7 @@ This package wraps scikit-learn's `GraphicalLasso` implementation and implements
 ## Support
 
 - Issues: [GitHub Issues](https://github.com/naandip/pyggm/issues)
-- Documentation: [docs/](docs/)
+- Examples & Tutorials: [examples/](examples/)
 
 ---
 
