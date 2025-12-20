@@ -373,74 +373,19 @@ The nonparanormal assumes a Gaussian copula: after transforming each variable's 
 
 1. **Use parallelization**: Set `n_jobs=-1` to use all CPU cores
 2. **For large p**: Consider using `method='ebic'` (faster than StARS)
-3. **For robust estimation**: Use `correlation='spearman'` or apply `NonparanormalTransformer`
-4. **For interpretability**: Use `method='stars'` with default `beta=0.05`
+3. **For interpretability**: Use `method='stars'` with default `beta=0.05`
 
-## Testing
-
-Run the test suite:
-
-```bash
-# Install test dependencies
-pip install -e ".[dev]"
-
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=pyggm --cov-report=html
-
-# Run specific test file
-pytest tests/test_ggm.py -v
-```
-
-## Development
-
-### Code formatting
-
-```bash
-# Format code
-black src/ tests/
-
-# Check with ruff
-ruff check src/ tests/ --fix
-```
-
-### Type checking
-
-```bash
-mypy src/pyggm/
-```
 
 ## Citation
 
-If you use PyGGM in your research, please cite the relevant papers:
+If you use PyGGM in your research, please cite:
 
 ```bibtex
-@article{liu2010stars,
-  title={Stability approach to regularization selection (stars) for high dimensional graphical models},
-  author={Liu, Han and Roeder, Kathryn and Wasserman, Larry},
-  journal={Advances in neural information processing systems},
-  volume={23},
-  year={2010}
-}
-
-@article{foygel2010ebic,
-  title={Extended Bayesian information criteria for Gaussian graphical models},
-  author={Foygel, Rina and Drton, Mathias},
-  journal={Advances in neural information processing systems},
-  volume={23},
-  pages={604--612},
-  year={2010}
-}
-
-@article{liu2009nonparanormal,
-  title={The nonparanormal: Semiparametric estimation of high dimensional undirected graphs},
-  author={Liu, Han and Lafferty, John and Wasserman, Larry},
-  journal={Journal of Machine Learning Research},
-  volume={10},
-  number={10},
-  year={2009}
+@software{pyggm,
+  title = {PyGGM: Gaussian Graphical Models in Python},
+  author = {Prasad, Nandini},
+  year = {2025},
+  url = {https://github.com/naandip/pyggm}
 }
 ```
 
