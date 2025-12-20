@@ -45,6 +45,7 @@ pyggm-test-env/
 # Jupyter
 .ipynb_checkpoints/
 *-checkpoint.ipynb
+.Rhistory
 
 # OS
 .DS_Store
